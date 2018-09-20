@@ -2,6 +2,13 @@ const canvas = document.getElementById("breakout");
 canvas.classList.add('no-cursor');
 const pen = canvas.getContext("2d");
 
+let background = document.createElement('img');
+background.src = 'background.jpg';
+let storm=document.createElement('img');
+storm.src = 'storm.jpg';
+let hitwall = new Audio('hitwall.mp3');
+let hitbox = new Audio('hitbox.mp3');
+let crash = new Audio('crash.mp3');
 let speed=5;
 let ballsize=15;
 
@@ -19,6 +26,12 @@ let y=canvas.height-ballsize-boxheight;
 
 function paintgame() {
   clear();
+  if (gamestate==='crashed') {
+    pen.drawImage(storm,0, 0,canvas.width, canvas.height);
+  }
+  else {
+    pen. drawImage(background, 0, 0,canvas.width, canvas.height);
+  }
   paintball(x,y,ballsize);
   paintBox(boxposition);
 
@@ -47,6 +60,7 @@ function paintgame() {
   }
 
   checkBallHitsBox();
+  checkCrashed();
 
   window.requestAnimationFrame(paintgame);
 }
@@ -131,12 +145,15 @@ function paintBox (x) {
 function checkEdgeHit() {
   if (y <= 0+ballsize) {
     movey= speed;
+    hitwall.play();
   }
   if (x >= 500-ballsize) {
     movex=-speed;
+    hitwall.play();
   }
   if (x <= 0+ballsize) {
     movex= speed;
+    hitwall.play();
   }
 }
 
@@ -144,6 +161,10 @@ function checkEdgeHit() {
 function checkBallHitsBox() {
   if (ballHitsBox()) {
     movey=-speed;
+    if (gamestate==='running') {
+      hitbox.play();
+    }
+
   }
 }
 
@@ -168,4 +189,19 @@ function ballHitsInsideBox() {
     return false;
   }
 }
+
+function checkCrashed() {
+  if (y>=canvas.height+ballsize/2) {
+    if (gamestate !== 'crashed') {
+        crash.play();
+        setTimeout(function(){
+          y=canvas.height-ballsize-boxheight;
+          gamestate='starting';
+        },3000);
+    }
+
+    gamestate = 'crashed';
+  }
+}
+
 window.requestAnimationFrame(paintgame);
