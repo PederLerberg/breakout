@@ -1,4 +1,5 @@
 const canvas = document.getElementById("breakout");
+canvas.classList.add('no-cursor');
 const pen = canvas.getContext("2d");
 
 let speed=5;
@@ -80,7 +81,10 @@ canvas.addEventListener('mousemove', event => {
 });
 canvas.addEventListener('click', ()=> {
   gamestate='running';
-})
+});
+// canvas.addEventListener('mouseenter', ()=> {
+//   canvas.classList
+// });
 
 function moveRight() {
   boxposition=boxposition+boxspeed;
