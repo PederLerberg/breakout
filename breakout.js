@@ -3,22 +3,47 @@ const pen = canvas.getContext("2d");
 
 let speed=5;
 let ballsize=15;
-let x=250;
-let y=200;
+
 let movex=speed;
-let movey=speed;
-let boxposition=15;
-let boxspeed=20;
+let movey=-speed;
 let boxsize=150;
+let boxheight=15;
+let boxposition=canvas.width/2-boxsize/2;
+let boxspeed=7;
+let leftdown=false;
+let rightdown=false;
+let gamestate='starting';
+let x=250;
+let y=canvas.height-ballsize-boxheight;
 
 function paintgame() {
   clear();
   paintball(x,y,ballsize);
   paintBox(boxposition);
 
-  x=x+movex;
-  y=y+movey;
-  checkEdgeHit();
+
+  if (gamestate==='starting') {
+    x=boxposition+boxsize/2;
+  }
+  if (gamestate==='running') {
+    x=x+movex;
+    y=y+movey;
+    checkEdgeHit();
+  }
+
+
+  if (leftdown===true) {
+    boxposition=boxposition-boxspeed;
+    if (boxposition<0) {
+      boxposition=0;
+    }
+  }
+  if (rightdown===true) {
+    boxposition=boxposition+boxspeed;
+    if (boxposition>500-boxsize) {
+      boxposition=500-boxsize;
+    }
+  }
 
   checkBallHitsBox();
 
@@ -29,12 +54,33 @@ function paintgame() {
 document.addEventListener('keydown', (event) => {
   const keyName = event.key;
   if (keyName==='ArrowRight') {
-    moveRight();
+    rightdown=true;
   }
   if (keyName==='ArrowLeft') {
-    moveLeft();
+    leftdown=true;
+  }
+  if (event.code==='Space') {
+    gamestate='running';
+  }
+
+});
+
+document.addEventListener('keyup', (event) => {
+  const keyName = event.key;
+  if (keyName==='ArrowRight') {
+    rightdown=false;
+  }
+  if (keyName==='ArrowLeft') {
+    leftdown=false;
   }
 });
+
+canvas.addEventListener('mousemove', event => {
+  boxposition=event.offsetX-boxsize/2;
+});
+canvas.addEventListener('click', ()=> {
+  gamestate='running';
+})
 
 function moveRight() {
   boxposition=boxposition+boxspeed;
@@ -73,7 +119,7 @@ function paintball(x,y,size) {
 function paintBox (x) {
   pen.beginPath();
   pen.fillStyle='blue';
-  pen.rect(x,400-20,boxsize,15);
+  pen.rect(x,canvas.height-boxheight,boxsize,boxheight);
   pen.fill();
 }
 
@@ -102,7 +148,7 @@ function ballHitsBox() {
 }
 
 function ballHitsTopBox() {
-  if (y>400-20-ballsize) {
+  if (y>=canvas.height-boxheight-ballsize && y<=canvas.height-boxheight-ballsize+speed) {
     return true;
   }
   else {
