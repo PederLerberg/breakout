@@ -21,8 +21,12 @@ let boxspeed=7;
 let leftdown=false;
 let rightdown=false;
 let gamestate='starting';
-let x=250;
-let y=canvas.height-ballsize-boxheight;
+
+let ballPos= {
+   x:250,
+   y:canvas.height-ballsize-boxheight
+}
+
 
 function paintgame() {
   clear();
@@ -32,16 +36,16 @@ function paintgame() {
   else {
     pen. drawImage(background, 0, 0,canvas.width, canvas.height);
   }
-  paintball(x,y,ballsize);
+  paintball(ballPos,ballsize);
   paintBox(boxposition);
 
 
   if (gamestate==='starting') {
-    x=boxposition+boxsize/2;
+    ballPos.x=boxposition+boxsize/2;
   }
   if (gamestate==='running') {
-    x=x+movex;
-    y=y+movey;
+    ballPos.x += movex;
+    ballPos.y+=movey;
     checkEdgeHit();
   }
 
@@ -126,10 +130,10 @@ function clear() {
   pen.stroke();
 }
 
-function paintball(x,y,size) {
+function paintball(pos,size) {
   pen.beginPath();
   pen.fillStyle='red';
-  pen.arc(x, y, size, 0, 2 * Math.PI);
+  pen.arc(pos.x, pos.y, size, 0, 2 * Math.PI);
   pen.fill();
 }
 
@@ -143,6 +147,8 @@ function paintBox (x) {
 
 
 function checkEdgeHit() {
+  let y= ballPos.y;
+  let x=ballPos.x;
   if (y <= 0+ballsize) {
     movey= speed;
     hitwall.play();
@@ -173,7 +179,8 @@ function ballHitsBox() {
 }
 
 function ballHitsTopBox() {
-  if (y>=canvas.height-boxheight-ballsize && y<=canvas.height-boxheight-ballsize+speed) {
+  let topbox=canvas.height-boxheight-ballsize;
+  if (ballPos.y>=topbox && ballPos.y<=topbox+speed) {
     return true;
   }
   else {
@@ -182,6 +189,7 @@ function ballHitsTopBox() {
 }
 
 function ballHitsInsideBox() {
+  let x= ballPos.x;
   if (x >= boxposition && x <= boxposition+boxsize) {
     return true;
   }
@@ -191,11 +199,11 @@ function ballHitsInsideBox() {
 }
 
 function checkCrashed() {
-  if (y>=canvas.height+ballsize/2) {
+  if (ballPos.y>=canvas.height+ballsize/2) {
     if (gamestate !== 'crashed') {
         crash.play();
         setTimeout(function(){
-          y=canvas.height-ballsize-boxheight;
+          ballPos.y=canvas.height-ballsize-boxheight;
           gamestate='starting';
         },3000);
     }
