@@ -2,61 +2,62 @@ const canvas = document.getElementById("breakout");
 canvas.classList.add('no-cursor');
 const pen = canvas.getContext("2d");
 
-let background = document.createElement('img');
-background.src = 'background.jpg';
-let storm=document.createElement('img');
-storm.src = 'storm.jpg';
-let hitwall = new Audio('hitwall.mp3');
-let hitbox = new Audio('hitbox.mp3');
-let crash = new Audio('crash.mp3');
-let speed=5;
-let ballsize=15;
+// background images
 
-let movex=speed;
-let movey=-speed;
-let boxsize=150;
-let boxheight=15;
-let boxposition=canvas.width/2-boxsize/2;
-let boxspeed=7;
-let leftdown=false;
-let rightdown=false;
-let gamestate='starting';
-let x=250;
-let y=canvas.height-ballsize-boxheight;
+const background = document.createElement('img');
+background.src = 'background.jpg';
+const storm=document.createElement('img');
+storm.src = 'storm.jpg';
+
+
+// our game data
+
+
+const box = {
+  size: 150,
+  height: 15,
+  position: canvas.width/2-150/2,
+  speed: 7
+}
+
+const ball = {
+  speed: 5,
+  size: 15,
+  x: 250,
+  y: canvas.height-15-box.height,
+  moveX: 5,
+  moveY: 5,
+}
+
+const game = {
+  leftDown: false,
+  rightDown: false,
+  state: 'starting'
+}
+
+
+// our main game loop
+
 
 function paintgame() {
   clear();
-  if (gamestate==='crashed') {
-    pen.drawImage(storm,0, 0,canvas.width, canvas.height);
-  }
-  else {
-    pen. drawImage(background, 0, 0,canvas.width, canvas.height);
-  }
-  paintball(x,y,ballsize);
-  paintBox(boxposition);
+  paintBackground();
+  paintball(ball.x,ball.y,ball.size);
+  paintBox(box.position);
 
-
-  if (gamestate==='starting') {
-    x=boxposition+boxsize/2;
+  if (game.state==='starting') {
+    moveBallAlong();
   }
-  if (gamestate==='running') {
-    x=x+movex;
-    y=y+movey;
+  else if (game.state==='running') {
+    moveBall();
     checkEdgeHit();
   }
 
-
-  if (leftdown===true) {
-    boxposition=boxposition-boxspeed;
-    if (boxposition<0) {
-      boxposition=0;
-    }
+  if (game.leftDown===true) {
+    moveBoxLeft();
   }
-  if (rightdown===true) {
-    boxposition=boxposition+boxspeed;
-    if (boxposition>500-boxsize) {
-      boxposition=500-boxsize;
-    }
+  if (game.rightDown===true) {
+    moveBoxRight();
   }
 
   checkBallHitsBox();
@@ -65,53 +66,10 @@ function paintgame() {
   window.requestAnimationFrame(paintgame);
 }
 
+window.requestAnimationFrame(paintgame);
 
-document.addEventListener('keydown', (event) => {
-  const keyName = event.key;
-  if (keyName==='ArrowRight') {
-    rightdown=true;
-  }
-  if (keyName==='ArrowLeft') {
-    leftdown=true;
-  }
-  if (event.code==='Space') {
-    gamestate='running';
-  }
 
-});
-
-document.addEventListener('keyup', (event) => {
-  const keyName = event.key;
-  if (keyName==='ArrowRight') {
-    rightdown=false;
-  }
-  if (keyName==='ArrowLeft') {
-    leftdown=false;
-  }
-});
-
-canvas.addEventListener('mousemove', event => {
-  boxposition=event.offsetX-boxsize/2;
-});
-canvas.addEventListener('click', ()=> {
-  gamestate='running';
-});
-// canvas.addEventListener('mouseenter', ()=> {
-//   canvas.classList
-// });
-
-function moveRight() {
-  boxposition=boxposition+boxspeed;
-  if (boxposition>500-boxsize) {
-    boxposition=500-boxsize;
-  }
-}
-function moveLeft() {
-  boxposition=boxposition-boxspeed;
-  if (boxposition<0) {
-    boxposition=0;
-  }
-}
+// game paint code
 
 
 function clear() {
@@ -126,6 +84,17 @@ function clear() {
   pen.stroke();
 }
 
+
+function paintBackground() {
+  if (game.state==='crashed') {
+    pen.drawImage(storm,0, 0,canvas.width, canvas.height);
+  }
+  else {
+    pen. drawImage(background, 0, 0,canvas.width, canvas.height);
+  }
+}
+
+
 function paintball(x,y,size) {
   pen.beginPath();
   pen.fillStyle='red';
@@ -137,52 +106,136 @@ function paintball(x,y,size) {
 function paintBox (x) {
   pen.beginPath();
   pen.fillStyle='blue';
-  pen.rect(x,canvas.height-boxheight,boxsize,boxheight);
+  pen.rect(x,canvas.height-box.height,box.size,box.height);
   pen.fill();
 }
 
 
+// game animation code
+
+
+function moveBallAlong() {
+  ball.x=box.position+box.size/2;
+}
+
+
+function moveBall() {
+  ball.x=ball.x+ball.moveX;
+  ball.y=ball.y+ball.moveY;
+}
+
+
+function moveBoxLeft() {
+  box.position=box.position-box.speed;
+  if (box.position<0) {
+    box.position=0;
+  }
+}
+
+
+function moveLeft() {
+  box.position=box.position-box.speed;
+  if (box.position<0) {
+    box.position=0;
+  }
+}
+
+
+function moveBoxRight() {
+  box.position=box.position+box.speed;
+  if (box.position>500-box.size) {
+    box.position=500-box.size;
+  }
+}
+
+
+function moveRight() {
+  box.position=box.position+box.speed;
+  if (box.position>500-box.size) {
+    box.position=500-box.size;
+  }
+}
+
+
+// event handling code
+
+
+document.addEventListener('keydown', (event) => {
+  const keyName = event.key;
+  if (keyName==='ArrowRight') {
+    game.rightDown=true;
+  }
+  if (keyName==='ArrowLeft') {
+    game.leftDown=true;
+  }
+  if (event.code==='Space') {
+    game.state='running';
+  }
+
+});
+
+
+document.addEventListener('keyup', (event) => {
+  const keyName = event.key;
+  if (keyName==='ArrowRight') {
+    game.rightDown=false;
+  }
+  if (keyName==='ArrowLeft') {
+    game.leftDown=false;
+  }
+});
+
+
+canvas.addEventListener('mousemove', event => {
+  box.position=event.offsetX-box.size/2;
+});
+
+
+canvas.addEventListener('click', ()=> {
+  game.state='running';
+});
+
+
+// crash detection code
+
+
 function checkEdgeHit() {
-  if (y <= 0+ballsize) {
-    movey= speed;
-    hitwall.play();
+  if (ball.y <= 0+ball.size) {
+    ball.moveY= ball.speed;
   }
-  if (x >= 500-ballsize) {
-    movex=-speed;
-    hitwall.play();
+  if (ball.x >= 500-ball.size) {
+    ball.moveX=-ball.speed;
   }
-  if (x <= 0+ballsize) {
-    movex= speed;
-    hitwall.play();
+  if (ball.x <= 0+ball.size) {
+    ball.moveX= ball.speed;
   }
 }
 
 
 function checkBallHitsBox() {
   if (ballHitsBox()) {
-    movey=-speed;
-    if (gamestate==='running') {
-      hitbox.play();
-    }
-
+    ball.moveY=-ball.speed;
   }
 }
+
 
 function ballHitsBox() {
   return ballHitsTopBox() && ballHitsInsideBox();
 }
 
+
 function ballHitsTopBox() {
-  if (y>=canvas.height-boxheight-ballsize && y<=canvas.height-boxheight-ballsize+speed) {
+  if (ball.y>=canvas.height-box.height-ball.size && ball.y<=canvas.height-box.height-ball.size+ball.speed) {
     return true;
   }
   else {
     return false;
   }
 }
+
 
 function ballHitsInsideBox() {
-  if (x >= boxposition && x <= boxposition+boxsize) {
+  if (ball.x >= box.position && ball.x <= box.position+box.size) {
     return true;
   }
   else {
@@ -190,18 +243,15 @@ function ballHitsInsideBox() {
   }
 }
 
-function checkCrashed() {
-  if (y>=canvas.height+ballsize/2) {
-    if (gamestate !== 'crashed') {
-        crash.play();
-        setTimeout(function(){
-          y=canvas.height-ballsize-boxheight;
-          gamestate='starting';
-        },3000);
-    }
 
-    gamestate = 'crashed';
+function checkCrashed() {
+  if (ball.y>=canvas.height+ball.size/2) {
+    if (game.state !== 'crashed') {
+      setTimeout(function(){
+        y=canvas.height-ball.size-box.height;
+        game.state='starting';
+      },3000);
+    }
+    game.state = 'crashed';
   }
 }
-
-window.requestAnimationFrame(paintgame);
