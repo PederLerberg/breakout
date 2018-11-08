@@ -26,6 +26,7 @@ let ballPos= {
    x:250,
    y:canvas.height-ballsize-boxheight
 }
+let tail = [ballPos];
 
 
 function paintgame() {
@@ -36,7 +37,8 @@ function paintgame() {
   else {
     pen. drawImage(background, 0, 0,canvas.width, canvas.height);
   }
-  paintball(ballPos,ballsize);
+  paintBalls(tail, ballsize);
+  // paintball(tail[0], ballsize);
   paintBox(boxposition);
 
 
@@ -128,6 +130,12 @@ function clear() {
   pen.lineTo(0, 0);
   pen.fill();
   pen.stroke();
+}
+
+function paintBalls(tail, size) {
+  for (let i = 0; i < tail.length; i++) {
+    paintball(tail[i], size);
+  }
 }
 
 function paintball(pos,size) {
