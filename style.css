@@ -1,3 +1,7 @@
 .no-cursor {
   cursor: none;
 }
+
+body {
+  margin: 0
+}
