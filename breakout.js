@@ -13,10 +13,16 @@ storm.src = 'storm.jpg';
 // our game data
 
 
+const game = {
+  leftDown: false,
+  rightDown: false,
+  state: 'starting'
+}
+
 const box = {
   size: 150,
   height: 15,
-  position: canvas.width/2-150/2,
+  x: canvas.width/2-150/2,
   speed: 7
 }
 
@@ -29,28 +35,23 @@ const ball = {
   moveY: 5,
 }
 
-const game = {
-  leftDown: false,
-  rightDown: false,
-  state: 'starting'
-}
-
 
 // our main game loop
 
 
 function paintgame() {
-  clear();
   paintBackground();
-  paintball(ball.x,ball.y,ball.size);
-  paintBox(box.position);
+  paintBall(ball);
+  paintBox(box);
 
   if (game.state==='starting') {
-    moveBallAlong();
+    moveBallAlongWithBox();
   }
   else if (game.state==='running') {
     moveBall();
     checkEdgeHit();
+    checkBallHitsBox();
+    checkCrashed();
   }
 
   if (game.leftDown===true) {
@@ -60,9 +61,6 @@ function paintgame() {
     moveBoxRight();
   }
 
-  checkBallHitsBox();
-  checkCrashed();
-
   window.requestAnimationFrame(paintgame);
 }
 
@@ -70,19 +68,6 @@ window.requestAnimationFrame(paintgame);
 
 
 // game paint code
-
-
-function clear() {
-  pen.beginPath();
-  pen.fillStyle='white';
-  pen.moveTo(0, 0);
-  pen.lineTo(500, 0);
-  pen.lineTo(500, 400);
-  pen.lineTo(0, 400);
-  pen.lineTo(0, 0);
-  pen.fill();
-  pen.stroke();
-}
 
 
 function paintBackground() {
@@ -95,18 +80,18 @@ function paintBackground() {
 }
 
 
-function paintball(x,y,size) {
+function paintBall(ball) {
   pen.beginPath();
   pen.fillStyle='red';
-  pen.arc(x, y, size, 0, 2 * Math.PI);
+  pen.arc(ball.x, ball.y, ball.size, 0, 2 * Math.PI);
   pen.fill();
 }
 
 
-function paintBox (x) {
+function paintBox(box) {
   pen.beginPath();
   pen.fillStyle='blue';
-  pen.rect(x,canvas.height-box.height,box.size,box.height);
+  pen.rect(box.x,canvas.height-box.height,box.size,box.height);
   pen.fill();
 }
 
@@ -114,8 +99,8 @@ function paintBox (x) {
 // game animation code
 
 
-function moveBallAlong() {
-  ball.x=box.position+box.size/2;
+function moveBallAlongWithBox() {
+  ball.x=box.x+box.size/2;
 }
 
 
@@ -126,33 +111,17 @@ function moveBall() {
 
 
 function moveBoxLeft() {
-  box.position=box.position-box.speed;
-  if (box.position<0) {
-    box.position=0;
-  }
-}
-
-
-function moveLeft() {
-  box.position=box.position-box.speed;
-  if (box.position<0) {
-    box.position=0;
+  box.x=box.x-box.speed;
+  if (box.x<0) {
+    box.x=0;
   }
 }
 
 
 function moveBoxRight() {
-  box.position=box.position+box.speed;
-  if (box.position>500-box.size) {
-    box.position=500-box.size;
-  }
-}
-
-
-function moveRight() {
-  box.position=box.position+box.speed;
-  if (box.position>500-box.size) {
-    box.position=500-box.size;
+  box.x=box.x+box.speed;
+  if (box.x>500-box.size) {
+    box.x=500-box.size;
   }
 }
 
@@ -171,7 +140,6 @@ document.addEventListener('keydown', (event) => {
   if (event.code==='Space') {
     game.state='running';
   }
-
 });
 
 
@@ -187,7 +155,7 @@ document.addEventListener('keyup', (event) => {
 
 
 canvas.addEventListener('mousemove', event => {
-  box.position=event.offsetX-box.size/2;
+  box.x=event.offsetX-box.size/2;
 });
 
 
@@ -235,7 +203,7 @@ function ballHitsTopBox() {
 
 
 function ballHitsInsideBox() {
-  if (ball.x >= box.position && ball.x <= box.position+box.size) {
+  if (ball.x >= box.x && ball.x <= box.x+box.size) {
     return true;
   }
   else {
