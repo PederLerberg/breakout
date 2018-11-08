@@ -1,6 +1,17 @@
+// the canvas where the game is painted
 const canvas = document.getElementById("breakout");
 canvas.classList.add('no-cursor');
 const pen = canvas.getContext("2d");
+
+
+// resize the canvas to the window size
+window.addEventListener('resize', resizeCanvas);
+function resizeCanvas() {
+	pen.canvas.width = document.documentElement.clientWidth;
+	pen.canvas.height = document.documentElement.clientHeight-4;
+}
+resizeCanvas();
+
 
 // background images
 
@@ -23,6 +34,7 @@ const box = {
   size: 150,
   height: 15,
   x: canvas.width/2-150/2,
+  y: canvas.height-15,
   speed: 7
 }
 
@@ -32,7 +44,7 @@ const ball = {
   x: 250,
   y: canvas.height-15-box.height,
   moveX: 5,
-  moveY: 5,
+  moveY: -5,
 }
 
 
@@ -45,20 +57,20 @@ function paintgame() {
   paintBox(box);
 
   if (game.state==='starting') {
-    moveBallAlongWithBox();
+    moveBallAlongWithBox(ball);
   }
   else if (game.state==='running') {
-    moveBall();
-    checkEdgeHit();
-    checkBallHitsBox();
-    checkCrashed();
+    moveBall(ball);
+    checkEdgeHit(ball);
+    checkBallHitsBox(ball);
+    checkCrashed(ball);
   }
 
   if (game.leftDown===true) {
-    moveBoxLeft();
+    moveBoxLeft(box);
   }
   if (game.rightDown===true) {
-    moveBoxRight();
+    moveBoxRight(box);
   }
 
   window.requestAnimationFrame(paintgame);
@@ -91,7 +103,7 @@ function paintBall(ball) {
 function paintBox(box) {
   pen.beginPath();
   pen.fillStyle='blue';
-  pen.rect(box.x,canvas.height-box.height,box.size,box.height);
+  pen.rect(box.x,box.y,box.size,box.height);
   pen.fill();
 }
 
@@ -99,18 +111,18 @@ function paintBox(box) {
 // game animation code
 
 
-function moveBallAlongWithBox() {
+function moveBallAlongWithBox(ball) {
   ball.x=box.x+box.size/2;
 }
 
 
-function moveBall() {
+function moveBall(ball) {
   ball.x=ball.x+ball.moveX;
   ball.y=ball.y+ball.moveY;
 }
 
 
-function moveBoxLeft() {
+function moveBoxLeft(box) {
   box.x=box.x-box.speed;
   if (box.x<0) {
     box.x=0;
@@ -118,10 +130,10 @@ function moveBoxLeft() {
 }
 
 
-function moveBoxRight() {
-  box.x=box.x+box.speed;
-  if (box.x>500-box.size) {
-    box.x=500-box.size;
+function moveBoxRight(box) {
+  box.x = box.x + box.speed;
+  if (box.x > canvas.width-box.size) {
+    box.x = canvas.width-box.size;
   }
 }
 
@@ -167,52 +179,42 @@ canvas.addEventListener('click', ()=> {
 // crash detection code
 
 
-function checkEdgeHit() {
-  if (ball.y <= 0+ball.size) {
-    ball.moveY= ball.speed;
+function checkEdgeHit(ball) {
+  if (ball.y <= ball.size) {
+    ball.moveY = ball.speed;
   }
-  if (ball.x >= 500-ball.size) {
-    ball.moveX=-ball.speed;
+  if (ball.x >= canvas.width-ball.size) {
+    ball.moveX =-ball.speed;
   }
-  if (ball.x <= 0+ball.size) {
-    ball.moveX= ball.speed;
-  }
-}
-
-
-function checkBallHitsBox() {
-  if (ballHitsBox()) {
-    ball.moveY=-ball.speed;
+  if (ball.x <= ball.size) {
+    ball.moveX = ball.speed;
   }
 }
 
 
-function ballHitsBox() {
-  return ballHitsTopBox() && ballHitsInsideBox();
-}
-
-
-function ballHitsTopBox() {
-  if (ball.y>=canvas.height-box.height-ball.size && ball.y<=canvas.height-box.height-ball.size+ball.speed) {
-    return true;
-  }
-  else {
-    return false;
+function checkBallHitsBox(ball) {
+  if (hitsBox(ball,box)) {
+    ball.moveY =- ball.speed;
   }
 }
 
 
-function ballHitsInsideBox() {
-  if (ball.x >= box.x && ball.x <= box.x+box.size) {
-    return true;
+function hitsBox(ball,box) {
+  const bounds = {
+    left: ball.x-ball.size/2,
+    right: ball.x+ball.size/2,
+    top: ball.y-ball.size/2,
+    bottom: ball.y+ball.size/2
   }
-  else {
-    return false;
-  }
+  const boxRight = box.x + box.size;
+  const boxBottom = box.y + box.height;
+  const insideLeftRight = bounds.right >= box.x && bounds.left <= boxRight;
+  const insideTopBottom = bounds.bottom >= box.y && bounds.top <= boxBottom;
+  return insideLeftRight && insideTopBottom;
 }
 
 
-function checkCrashed() {
+function checkCrashed(ball) {
   const ballAtBottom = ball.y >= canvas.height + ball.size/2;
   if (ballAtBottom) {
     if (game.state !== 'crashed') {
