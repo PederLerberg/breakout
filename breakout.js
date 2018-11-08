@@ -213,11 +213,12 @@ function ballHitsInsideBox() {
 
 
 function checkCrashed() {
-  if (ball.y>=canvas.height+ball.size/2) {
+  const ballAtBottom = ball.y >= canvas.height + ball.size/2;
+  if (ballAtBottom) {
     if (game.state !== 'crashed') {
-      setTimeout(function(){
-        y=canvas.height-ball.size-box.height;
-        game.state='starting';
+      setTimeout(() => {
+        ball.y = canvas.height - ball.size - box.height;
+        game.state = 'starting';
       },3000);
     }
     game.state = 'crashed';
