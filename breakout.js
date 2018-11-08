@@ -48,6 +48,15 @@ const ball = {
 }
 
 
+const blocks = [
+  { size: 75, height: 20, x: 20, y: 20 },
+  { size: 75, height: 20, x: 20+90, y: 20 },
+  { size: 75, height: 20, x: 20+90*2, y: 20 },
+  { size: 75, height: 20, x: 20+90*3, y: 20 },
+  { size: 75, height: 20, x: 20+90*4, y: 20 },
+];
+
+
 // our main game loop
 
 
@@ -55,6 +64,7 @@ function paintgame() {
   paintBackground();
   paintBall(ball);
   paintBox(box);
+  blocks.forEach(paintBox);
 
   if (game.state==='starting') {
     moveBallAlongWithBox(ball);
