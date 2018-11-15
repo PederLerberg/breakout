@@ -7,6 +7,8 @@ const BALL_SPEED = 5;
 const BLOCK_ROW_COUNT = 3;
 const BLOCK_COLUMN_COUNT = 5;
 let blocks = [];
+let blockState = new Array(BLOCK_ROW_COUNT*BLOCK_COLUMN_COUNT);
+
 
 // resize the canvas to the window size
 window.addEventListener('resize', resizeCanvas);
@@ -60,10 +62,11 @@ function paintgame() {
   paintBackground();
   paintBall(ball);
   paintBox(box);
-	blocks.forEach(paintBox);
+	blocks.forEach(paintBlock);
 
   if (game.state==='starting') {
     moveBallAlongWithBox(ball);
+		blockState.fill(true, 0, blockState.length);
   }
   else if (game.state==='running') {
     moveBall(ball);
@@ -112,6 +115,13 @@ function paintBox(box) {
   pen.fillStyle='blue';
   pen.rect(box.x,box.y,box.width,box.height);
   pen.fill();
+}
+
+
+function paintBlock(block) {
+	if (blockState[block.index]) {
+		paintBox(block);
+	}
 }
 
 
@@ -208,11 +218,18 @@ function checkBallHitsBox(ball) {
 
 function checkBallHitsBlocks(ball,blocks) {
 	blocks.forEach(block => {
-		if (hitsBox(ball,block)) {
+		if (hitsBlock(ball,block)) {
 			ball.moveY = -ball.moveY;
+			blockState[block.index] = false;
 	  }
 	});
 }
+
+
+function hitsBlock(ball,block) {
+	return blockState[block.index] && hitsBox(ball, block);
+}
+
 
 function hitsBox(ball,box) {
   const bounds = {
