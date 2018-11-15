@@ -16,7 +16,7 @@ let blockState = new Array(BLOCK_ROW_COUNT*BLOCK_COLUMN_COUNT);
 // background images
 
 const background = document.createElement('img');
-background.src = 'background5.jpg';
+background.src = 'sunset.jpg';
 const storm=document.createElement('img');
 storm.src = 'storm.jpg';
 
@@ -54,7 +54,7 @@ const ball = {
 function paintgame() {
   paintBackground();
   paintBall(ball);
-  paintBox(box);
+  paintPadle(box);
 	blocks.forEach(paintBlock);
 
   if (game.state==='starting') {
@@ -64,7 +64,7 @@ function paintgame() {
   else if (game.state==='running') {
     moveBall(ball);
     checkEdgeHit(ball);
-    checkBallHitsBox(ball);
+    checkBallHitsPadle(ball);
 		checkBallHitsBlocks(ball,blocks);
     checkCrashed(ball);
   }
@@ -100,6 +100,10 @@ function paintBall(ball) {
   pen.fill();
 }
 
+
+function paintPadle(box) {
+	paintBox(box);
+}
 
 function paintBox(box, color, offset = 0) {
   pen.beginPath();
@@ -212,7 +216,7 @@ function checkEdgeHit(ball) {
 }
 
 
-function checkBallHitsBox(ball) {
+function checkBallHitsPadle(ball) {
   if (hitsBox(ball,box)) {
     ball.moveY =- ball.speed;
   }
