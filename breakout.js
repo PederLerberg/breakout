@@ -2,28 +2,21 @@
 const canvas = document.getElementById("breakout");
 canvas.classList.add('no-cursor');
 const pen = canvas.getContext("2d");
+pen.lineJoin = 'round';
 
 const BALL_SPEED = 5;
-const BLOCK_ROW_COUNT = 3;
-const BLOCK_COLUMN_COUNT = 5;
+const BALL_SIZE = 12;
+const BLOCK_ROW_COUNT = 6;
+const BLOCK_COLUMN_COUNT = 5 ;
 let blocks = [];
 let blockState = new Array(BLOCK_ROW_COUNT*BLOCK_COLUMN_COUNT);
 
-
-// resize the canvas to the window size
-window.addEventListener('resize', resizeCanvas);
-function resizeCanvas() {
-	pen.canvas.width = document.documentElement.clientWidth;
-	pen.canvas.height = document.documentElement.clientHeight-4;
-	blocks = calculateBlocks();
-}
-resizeCanvas();
 
 
 // background images
 
 const background = document.createElement('img');
-background.src = 'background.jpg';
+background.src = 'background5.jpg';
 const storm=document.createElement('img');
 storm.src = 'storm.jpg';
 
@@ -47,7 +40,7 @@ const box = {
 
 const ball = {
   speed: BALL_SPEED,
-  size: 15,
+  size: BALL_SIZE,
   x: 250,
   y: canvas.height-15-box.height,
   moveX: BALL_SPEED,
@@ -86,8 +79,6 @@ function paintgame() {
   window.requestAnimationFrame(paintgame);
 }
 
-window.requestAnimationFrame(paintgame);
-
 
 // game paint code
 
@@ -110,17 +101,18 @@ function paintBall(ball) {
 }
 
 
-function paintBox(box) {
+function paintBox(box, color, offset = 0) {
   pen.beginPath();
-  pen.fillStyle='blue';
-  pen.rect(box.x,box.y,box.width,box.height);
+  pen.fillStyle = color || 'blue';
+  pen.rect(box.x + offset, box.y + offset, box.width, box.height);
   pen.fill();
 }
 
 
 function paintBlock(block) {
 	if (blockState[block.index]) {
-		paintBox(block);
+		paintBox(block, 'rgba(0,0,0,0.2)', 3);
+		paintBox(block, block.color);
 	}
 }
 
@@ -191,6 +183,17 @@ canvas.addEventListener('mousemove', event => {
 canvas.addEventListener('click', ()=> {
   game.state='running';
 });
+
+
+// resize the canvas to the window size
+window.addEventListener('resize', resizeCanvas);
+function resizeCanvas() {
+	pen.canvas.width = document.documentElement.clientWidth;
+	pen.canvas.height = document.documentElement.clientHeight-4;
+	blocks = calculateBlocks();
+	box.y = canvas.height - box.height;
+	ball.y = canvas.height - ball.size - box.height;
+}
 
 
 // crash detection code
@@ -270,6 +273,7 @@ function calculateBlocks() {
 			const index = BLOCK_COLUMN_COUNT * row + column;
 			blocks[index] = calculateBlock(row, column);
 			blocks[index].index = index;
+			blocks[index].color = randomColor();
 		}
 	}
 	return blocks;
@@ -277,7 +281,7 @@ function calculateBlocks() {
 
 
 function calculateBlock(row, column) {
-	let height = canvas.height * 0.3 / BLOCK_ROW_COUNT;
+	let height = canvas.height * 0.4 / BLOCK_ROW_COUNT;
 	let width = canvas.width / BLOCK_COLUMN_COUNT;
 	const space_x = width / 10;
 	const space_y = height / 5;
@@ -289,3 +293,14 @@ function calculateBlock(row, column) {
 	y = y + space_y;
 	return { height, width, x, y };
 }
+
+
+function randomColor() {
+	const r = Math.round(Math.random()*255);
+	const g = Math.round(Math.random()*255);
+	const b = Math.round(Math.random()*255);
+	return `rgba(${r},${g},${b},0.75)`;
+}
+
+resizeCanvas();
+window.requestAnimationFrame(paintgame);
