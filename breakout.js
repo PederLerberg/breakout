@@ -17,8 +17,10 @@ let blockState = new Array(BLOCK_ROW_COUNT*BLOCK_COLUMN_COUNT);
 
 const background = document.createElement('img');
 background.src = 'sunset.jpg';
-const storm=document.createElement('img');
+const storm = document.createElement('img');
 storm.src = 'storm.jpg';
+const paddle = document.createElement('img');
+paddle.src = 'paddle.png';
 
 
 // our game data
@@ -31,8 +33,8 @@ const game = {
 }
 
 const box = {
-  width: 150,
-  height: 15,
+  width: 100,
+  height: 20,
   x: canvas.width/2-150/2,
   y: canvas.height-15,
   speed: 7
@@ -88,7 +90,7 @@ function paintBackground() {
     pen.drawImage(storm,0, 0,canvas.width, canvas.height);
   }
   else {
-    pen. drawImage(background, 0, 0,canvas.width, canvas.height);
+    pen.drawImage(background, 0, 0,canvas.width, canvas.height);
   }
 }
 
@@ -102,7 +104,8 @@ function paintBall(ball) {
 
 
 function paintPadle(box) {
-	paintBox(box);
+	// paintBox(box);
+	pen.drawImage(paddle, box.x, box.y, box.width, box.height);
 }
 
 function paintBox(box, color, offset = 0) {
@@ -195,8 +198,8 @@ function resizeCanvas() {
 	pen.canvas.width = document.documentElement.clientWidth;
 	pen.canvas.height = document.documentElement.clientHeight-4;
 	blocks = calculateBlocks();
-	box.y = canvas.height - box.height;
-	ball.y = canvas.height - ball.size - box.height;
+	box.y = canvas.height - box.height - 5;
+	ball.y = box.y - ball.size - 2;
 }
 
 
