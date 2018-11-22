@@ -16,11 +16,11 @@ let blockState = new Array(BLOCK_ROW_COUNT*BLOCK_COLUMN_COUNT);
 // background images
 
 const background = document.createElement('img');
-background.src = 'sunset.jpg';
+background.src = 'images/sunset.jpg';
 const storm = document.createElement('img');
-storm.src = 'storm.jpg';
+storm.src = 'images/storm.jpg';
 const paddle = document.createElement('img');
-paddle.src = 'paddle.png';
+paddle.src = 'images/paddle.png';
 
 
 // our game data
