@@ -4,16 +4,18 @@ canvas.classList.add('no-cursor');
 const pen = canvas.getContext("2d");
 pen.lineJoin = 'round';
 
-const BALL_SPEED = 5;
+const BALL_SPEED = 10;
 const BALL_SIZE = 12;
 const BLOCK_ROW_COUNT = 6;
 const BLOCK_COLUMN_COUNT = 5 ;
+const TOUCH_AREA = 150;
+
 let blocks = [];
 let blockState = new Array(BLOCK_ROW_COUNT*BLOCK_COLUMN_COUNT);
 
 
-
 // background images
+
 
 const background = document.createElement('img');
 background.src = 'images/sunset.jpg';
@@ -32,11 +34,18 @@ const game = {
   state: 'starting'
 }
 
+const gameBox = {
+  x: 0,
+  y: 0,
+  width: canvas.width,
+  height: canvas.height - TOUCH_AREA
+}
+
 const box = {
-  width: 500,
-  height: 20,
-  x: canvas.width/2-150/2,
-  y: canvas.height-15,
+  width:  gameBox.width/6,
+  height: gameBox.width/6/4,
+  x: gameBox.width/2-gameBox.width/20,
+  y: gameBox.height-15,
   speed: 7
 }
 
@@ -44,7 +53,7 @@ const ball = {
   speed: BALL_SPEED,
   size: BALL_SIZE,
   x: 250,
-  y: canvas.height-15-box.height,
+  y: gameBox.height-15-box.height,
   moveX: BALL_SPEED,
   moveY: -BALL_SPEED,
 }
@@ -86,12 +95,19 @@ function paintgame() {
 
 
 function paintBackground() {
+  clear();
   if (game.state==='crashed') {
-    pen.drawImage(storm,0, 0,canvas.width, canvas.height);
+    pen.drawImage(storm,0, 0, gameBox.width, gameBox.height);
   }
   else {
-    pen.drawImage(background, 0, 0,canvas.width, canvas.height);
+    pen.drawImage(background, 0, 0, gameBox.width, gameBox.height-TOUCH_AREA);
   }
+}
+
+
+function clear() {
+  pen.fillStyle = 'white';
+  pen.fillRect(0, 0, canvas.width, canvas.height);
 }
 
 
@@ -148,8 +164,8 @@ function moveBoxLeft(box) {
 
 function moveBoxRight(box) {
   box.x = box.x + box.speed;
-  if (box.x > canvas.width-box.width) {
-    box.x = canvas.width-box.width;
+  if (box.x > gameBox.width-box.width) {
+    box.x = gameBox.width-box.width;
   }
 }
 
@@ -203,8 +219,24 @@ function resizeCanvas() {
 	pen.canvas.width = document.documentElement.clientWidth;
 	pen.canvas.height = document.documentElement.clientHeight-4;
 	blocks = calculateBlocks();
-	box.y = canvas.height - box.height - 5;
-	ball.y = box.y - ball.size - 2;
+  gameBox.width = pen.canvas.width;
+  gameBox.height = pen.canvas.height - TOUCH_AREA;
+  updatePaddleSize();
+  updateBallSizeAndSpeed();
+}
+
+
+function updatePaddleSize() {
+  box.width = gameBox.width/6;
+  box.height = box.width/4;
+  box.y = gameBox.height - box.height - 5;
+}
+
+
+function updateBallSizeAndSpeed() {
+  ball.size = box.width/6;
+  ball.y = box.y - ball.size - 2;
+  ball.speed = ball.size/4;
 }
 
 
@@ -215,7 +247,7 @@ function checkEdgeHit(ball) {
   if (ball.y <= ball.size) {
     ball.moveY = ball.speed;
   }
-  if (ball.x >= canvas.width-ball.size) {
+  if (ball.x >= gameBox.width-ball.size) {
     ball.moveX =-ball.speed;
   }
   if (ball.x <= ball.size) {
@@ -262,11 +294,11 @@ function hitsBox(ball,box) {
 
 
 function checkCrashed(ball) {
-  const ballAtBottom = ball.y >= canvas.height + ball.size/2;
+  const ballAtBottom = ball.y >= gameBox.height + ball.size/2;
   if (ballAtBottom) {
     if (game.state !== 'crashed') {
       setTimeout(() => {
-        ball.y = canvas.height - ball.size - box.height;
+        ball.y = gameBox.height - ball.size - box.height;
         game.state = 'starting';
       },3000);
     }
