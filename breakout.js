@@ -33,7 +33,7 @@ const game = {
 }
 
 const box = {
-  width: 100,
+  width: 50,
   height: 20,
   x: canvas.width/2-150/2,
   y: canvas.height-15,
@@ -185,6 +185,11 @@ document.addEventListener('keyup', (event) => {
 canvas.addEventListener('mousemove', event => {
   box.x=event.offsetX-box.width/2;
 });
+
+canvas.addEventListener("touchmove", event => {
+  const x = event.touches[0].clientX;
+  box.x = x - box.width/2;
+} ,false);
 
 
 canvas.addEventListener('click', ()=> {
