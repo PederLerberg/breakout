@@ -33,7 +33,7 @@ const game = {
 }
 
 const box = {
-  width: 50,
+  width: 500,
   height: 20,
   x: canvas.width/2-150/2,
   y: canvas.height-15,
