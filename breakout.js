@@ -4,7 +4,7 @@ canvas.classList.add('no-cursor');
 const pen = canvas.getContext("2d");
 pen.lineJoin = 'round';
 
-const BALL_SPEED = 5;
+const BALL_SPEED = 7;
 const BALL_SIZE = 12;
 const BLOCK_ROW_COUNT = 6;
 const BLOCK_COLUMN_COUNT = 5 ;
@@ -35,21 +35,23 @@ const game = {
   hasTouch: false
 }
 
+const boxWidth = canvas.width / 6;
 const box = {
-  width:  canvas.width/6,
-  x: canvas.width/2-canvas.width/20,
-  height: canvas.width/6/4,
-  y: canvas.height-15,
+  width: boxWidth,
+  x: canvas.width/2 - boxWidth/2,
+  height: boxWidth / 4,
+  y: canvas.height-boxWidth,
   speed: 7
 }
 
+const speed = ballSpeed(canvas.height);
 const ball = {
-  speed: BALL_SPEED,
-  x: 250,
   size: BALL_SIZE,
+  x: 250,
   y: canvas.height-15-box.height,
-  moveX: BALL_SPEED,
-  moveY: -BALL_SPEED,
+  speed,
+  moveX: speed,
+  moveY: -speed,
 }
 
 
@@ -116,6 +118,7 @@ function paintPadle(box) {
 	// paintBox(box);
 	pen.drawImage(paddle, box.x, box.y, box.width, box.height);
 }
+
 
 function paintBox(box, color, offset = 0) {
   pen.beginPath();
@@ -211,7 +214,7 @@ canvas.addEventListener("touchmove", event => {
 
 
 canvas.addEventListener('click', ()=> {
-  game.state='running';
+  game.state = 'running';
 });
 
 
@@ -236,9 +239,19 @@ function updatePaddleSize() {
 
 
 function updateBallSizeAndSpeed() {
+  const boxWidth = canvas.width / 6;
+  box.width = canvas.width / 6;
+  box.height = box.width / 4;
+  box.y = canvas.height - box.height;
+
   ball.size = box.width/6;
   ball.y = box.y - ball.size - 2;
-  ball.speed = ball.size/4;
+  ball.speed = ballSpeed(canvas.height);
+}
+
+
+function ballSpeed(height) {
+  return height / 250 * BALL_SPEED;
 }
 
 
@@ -247,7 +260,7 @@ function updateBallSizeAndSpeed() {
 
 function checkEdgeHit(ball) {
   if (ball.y <= ball.size) {
-    ball.moveY = ball.speed;
+    ball.moveY = ball.moveY;
   }
   if (ball.x >= canvas.width-ball.size) {
     ball.moveX = -ball.moveX;
@@ -260,7 +273,7 @@ function checkEdgeHit(ball) {
 
 function checkBallHitsPadle(ball) {
   if (hitsBox(ball,box)) {
-    ball.moveY = -ball.speed;
+    ball.moveY = -ball.moveY;
     if (hitsLeftSide(ball,box)) {
       ball.moveX -= 2;
     }
