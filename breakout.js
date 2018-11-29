@@ -31,7 +31,8 @@ const game = {
   leftDown: false,
   rightDown: false,
   state: 'starting',
-  touchStart: 0
+  touchStart: 0,
+  hasTouch: false
 }
 
 const box = {
@@ -191,20 +192,21 @@ document.addEventListener('keyup', (event) => {
 
 
 canvas.addEventListener('mousemove', event => {
-  box.x=event.offsetX-box.width/2;
+  if (!game.hasTouch) {
+    box.x = event.offsetX - box.width/2;
+  }
 });
 
 canvas.addEventListener("touchstart", event => {
-  console.log(event);
   game.touchStart = event.touches[0].clientX;
+  game.hasTouch = true;
 });
 
 canvas.addEventListener("touchmove", event => {
   const x = event.touches[0].clientX;
-  const move = game.touchStart - x;
+  const move = x - game.touchStart;
   box.x += move;
   game.touchStart = x;
-  // box.x = x - box.width/2;
 } ,false);
 
 
