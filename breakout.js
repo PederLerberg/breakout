@@ -8,6 +8,7 @@ const BALL_SPEED = 7;
 const BALL_SIZE = 12;
 const BLOCK_ROW_COUNT = 6;
 const BLOCK_COLUMN_COUNT = 5 ;
+const TOUCH_AREA = 500;
 
 let blocks = [];
 let blockState = new Array(BLOCK_ROW_COUNT*BLOCK_COLUMN_COUNT);
@@ -36,11 +37,12 @@ const game = {
 }
 
 const boxWidth = canvas.width / 6;
+const boxHeight = boxWidth / 4;
 const box = {
   width: boxWidth,
   x: canvas.width/2 - boxWidth/2,
   height: boxWidth / 4,
-  y: canvas.height-boxWidth,
+  y: canvas.height - boxHeight - TOUCH_AREA,
   speed: 7
 }
 
@@ -232,18 +234,14 @@ function resizeCanvas() {
 
 
 function updatePaddleSize() {
-  box.height = box.width/4;
-  box.width = canvas.width/6;
-  box.y = canvas.height - box.height - 5;
+  const boxWidth = canvas.width / 6;
+  box.width = canvas.width / 6;
+  box.height = box.width / 4;
+  box.y = canvas.height - box.height - TOUCH_AREA;
 }
 
 
 function updateBallSizeAndSpeed() {
-  const boxWidth = canvas.width / 6;
-  box.width = canvas.width / 6;
-  box.height = box.width / 4;
-  box.y = canvas.height - box.height;
-
   ball.size = box.width/6;
   ball.y = box.y - ball.size - 2;
   ball.speed = ballSpeed(canvas.height);
@@ -336,7 +334,7 @@ function checkCrashed(ball) {
   if (ballAtBottom) {
     if (game.state !== 'crashed') {
       setTimeout(() => {
-        ball.y = canvas.height - ball.size - box.height;
+        ball.y = box.y - ball.size;
         game.state = 'starting';
       },3000);
     }
