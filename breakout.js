@@ -4,7 +4,7 @@ canvas.classList.add('no-cursor');
 const pen = canvas.getContext("2d");
 pen.lineJoin = 'round';
 
-const BALL_SPEED = 10;
+const BALL_SPEED = 5;
 const BALL_SIZE = 12;
 const BLOCK_ROW_COUNT = 6;
 const BLOCK_COLUMN_COUNT = 5 ;
@@ -141,8 +141,8 @@ function moveBallAlongWithBox(ball) {
 
 
 function moveBall(ball) {
-  ball.x=ball.x+ball.moveX;
-  ball.y=ball.y+ball.moveY;
+  ball.x = ball.x + ball.moveX;
+  ball.y = ball.y + ball.moveY;
 }
 
 
@@ -240,20 +240,43 @@ function checkEdgeHit(ball) {
     ball.moveY = ball.speed;
   }
   if (ball.x >= canvas.width-ball.size) {
-    ball.moveX =-ball.speed;
+    ball.moveX = -ball.moveX;
   }
   if (ball.x <= ball.size) {
-    ball.moveX = ball.speed;
+    ball.moveX = -ball.moveX;
   }
 }
 
 
 function checkBallHitsPadle(ball) {
   if (hitsBox(ball,box)) {
-    ball.moveY =- ball.speed;
+    ball.moveY = -ball.speed;
+    if (hitsLeftSide(ball,box)) {
+      ball.moveX -= 2;
+    }
+    else if (hitsRightSide(ball,box)){
+      ball.moveX += 2;
+
+    }
   }
 }
+function hitsLeftSide(ball,box) {
+  if (ball.x < box.x + box.width / 5) {
+    return true;
+  }
+  else {
+    return false;
+  }
 
+}
+function hitsRightSide(ball,box) {
+  if (ball.x > box.x + box.width - box.width / 5) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
 
 function checkBallHitsBlocks(ball,blocks) {
 	blocks.forEach(block => {
