@@ -8,7 +8,8 @@ const BALL_SPEED = 7;
 const BALL_SIZE = 12;
 const BLOCK_ROW_COUNT = 6;
 const BLOCK_COLUMN_COUNT = 5 ;
-const TOUCH_AREA = 500;
+const TOUCH_AREA = 400;
+const BALL_COLOR = 'white';
 
 let blocks = [];
 let blockState = new Array(BLOCK_ROW_COUNT*BLOCK_COLUMN_COUNT);
@@ -18,7 +19,7 @@ let blockState = new Array(BLOCK_ROW_COUNT*BLOCK_COLUMN_COUNT);
 
 
 const background = document.createElement('img');
-background.src = 'images/sunset.jpg';
+background.src = 'images/backgroundvol.3.jpg';
 const storm = document.createElement('img');
 storm.src = 'images/storm.jpg';
 const paddle = document.createElement('img');
@@ -110,7 +111,8 @@ function clear() {
 
 function paintBall(ball) {
   pen.beginPath();
-  pen.fillStyle='red';
+  pen.fillStyle = BALL_COLOR;
+  // pen.fillStyle = randomColor();
   pen.arc(ball.x, ball.y, ball.size, 0, 2 * Math.PI);
   pen.fill();
 }
@@ -353,7 +355,8 @@ function calculateBlocks() {
 			const index = BLOCK_COLUMN_COUNT * row + column;
 			blocks[index] = calculateBlock(row, column);
 			blocks[index].index = index;
-			blocks[index].color = randomColor();
+			// blocks[index].color = randomColor();
+      blocks[index].color = 'yellow';
 		}
 	}
 	return blocks;
