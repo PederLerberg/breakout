@@ -4,11 +4,11 @@ canvas.classList.add('no-cursor');
 const pen = canvas.getContext("2d");
 pen.lineJoin = 'round';
 
-const BALL_SPEED = 7;
+const BALL_SPEED = 3;
 const BALL_SIZE = 12;
 const BLOCK_ROW_COUNT = 6;
 const BLOCK_COLUMN_COUNT = 5 ;
-const TOUCH_AREA = 400;
+const TOUCH_AREA = 300;
 const BALL_COLOR = 'white';
 
 let blocks = [];
