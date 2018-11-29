@@ -4,7 +4,7 @@ canvas.classList.add('no-cursor');
 const pen = canvas.getContext("2d");
 pen.lineJoin = 'round';
 
-const BALL_SPEED = 3;
+const BALL_SPEED = 5;
 const BALL_SIZE = 12;
 const BLOCK_ROW_COUNT = 6;
 const BLOCK_COLUMN_COUNT = 5 ;
