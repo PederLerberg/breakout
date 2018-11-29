@@ -30,9 +30,9 @@ paddle.src = 'images/paddle.png';
 const game = {
   leftDown: false,
   rightDown: false,
-  state: 'starting'
+  state: 'starting',
+  touchStart: 0
 }
-
 
 const box = {
   width:  canvas.width/6,
@@ -194,9 +194,17 @@ canvas.addEventListener('mousemove', event => {
   box.x=event.offsetX-box.width/2;
 });
 
+canvas.addEventListener("touchstart", event => {
+  console.log(event);
+  game.touchStart = event.touches[0].clientX;
+});
+
 canvas.addEventListener("touchmove", event => {
   const x = event.touches[0].clientX;
-  box.x = x - box.width/2;
+  const move = game.touchStart - x;
+  box.x += move;
+  game.touchStart = x;
+  // box.x = x - box.width/2;
 } ,false);
 
 
